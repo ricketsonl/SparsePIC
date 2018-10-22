@@ -13,7 +13,7 @@ import InverseSampling as IS
 ## User Input ##
 dsizex = 40.; dsizey = 40.
 ncx = 128; ncy = 128
-T = 60.
+T = 30.
 step_per_tp = 10.
 N_per_cell = 60
 
@@ -29,7 +29,7 @@ CFL = delx/delt
 print('Proximity to CFL limit (stable if > 1): ' + str(CFL))
 
 ## Name of movie showing density evolution to be saved ##
-anim_name = 'DiocotronFG'
+anim_name = 'DiocotronForcedFG'
 
 ## Function that generates initial particle positions and velocities ##
 ## Both x and v should have shape (N,2) ##
@@ -45,8 +45,13 @@ def idatgen(N,Lx,Ly):
 
     return x, v
 
+## The forcing function on the right side of the Vlasov equation.  Just a sine for demsonstration here. ##
+def RHSfunc(x,v,t):
+    N = x.shape[0]
+    return 0.5*np.sin(t)*np.ones(N)
+
 ## Build PIC object ##
-schimp = PIC2DFG.PICES2DFG(T,dsizex,dsizey,ncx,ncy,nstep,idatgen,N)
+schimp = PIC2DFG.PICES2DFG(T,dsizex,dsizey,ncx,ncy,nstep,idatgen,N,varwts=True,RHS=RHSfunc)
 ## Set magnetic field ##
 schimp.B = 15.
 
