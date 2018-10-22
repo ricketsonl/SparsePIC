@@ -5,17 +5,17 @@ Created on Mon Feb  8 15:38:41 2016
 @author: ricketsonl
 """
 import numpy as np
-import PICES2D_Exp_Sparse_Eff as PIC2D
+import PICES_2DSG as PIC2D
 import time
 import matplotlib.pyplot as plt
 
 
 ## User Input ##
 dsizex = 40.; dsizey = 40.      ## Size of the domain - measured in DeBye lengths
-ncx = 256                       ## Effective resolution in each direction of the sparse grid to be used (must be power of 2 for now)
-T = 60.0                        ## Final time of the simulation
-step_per_tp = 10.               ## Time steps per inverse plasma frequency
-N_per_sparse_cell = 40          ## Number of simulation particles per sparse cell
+ncx = 512                       ## Effective resolution in each direction of the sparse grid to be used (must be power of 2 for now)
+T = 40.0                        ## Final time of the simulation
+step_per_tp = 20.               ## Time steps per inverse plasma frequency
+N_per_sparse_cell = 30          ## Number of simulation particles per sparse cell
 
 Bfield = 15.                    ## Strengh of magnetic field, i.e. cyclotron frequency / plasma frequency
 
@@ -26,7 +26,7 @@ nstep = int(step_per_tp*T)
 N = int(N_per_sparse_cell*ncx*(3.*np.log2(ncx)-1))
 
 ## Name of movie file to be generated
-animname = 'Diocotron' + str(ncx) + 'c_' + str(N_per_sparse_cell) + 'p_' + str(int(Bfield)) + 'B'
+animname = 'DiocotronSG' + str(ncx) + 'c_' + str(N_per_sparse_cell) + 'p_' + str(int(Bfield)) + 'B'
 
 print('Total particle number: ' + str(N))
 
@@ -47,7 +47,7 @@ def idatgen(N,Lx,Ly):
     
     return x, v
 
-scheme = PIC2D.PICES2D_Exp_Sparse(T,dsizex,dsizey,ncx,nstep,idatgen,N) ## Create scheme object
+scheme = PIC2D.PICES2DSG(T,dsizex,dsizey,ncx,nstep,idatgen,N) ## Create scheme object
 scheme.B = Bfield                                                      ## Set magnetic field
 
 ## Runs scheme and times execution ##

@@ -18,7 +18,7 @@ from matplotlib import animation
 #import Filters as FIL
 
 
-class PICES2D_Exp_Sparse:
+class PICES2DSG:
     chrg = -1.
     space_norm = 1; time_norm = np.inf # Sets the space- and time-norms for variances
     imptol = 1.e-10 # Tolerance for Newton-Krylov iteration
@@ -33,6 +33,7 @@ class PICES2D_Exp_Sparse:
         self.dx = domx/self.ncelx; self.dy = domy/self.ncely
         
         self.IDatGen = idata
+        self.time = 0.
 
         self.x, self.v = self.IDatGen(Npi,domx,domy)
         if np.amin(self.x) < 0. or np.amax(self.x[:,0]) > self.DomLenX or np.amax(self.x[:,1]) > self.DomLenY:
@@ -72,8 +73,6 @@ class PICES2D_Exp_Sparse:
             
         self.v += 0.5*self.dt*self.chrg*self.Epar
         t = self.chrg*self.B*self.dt/2.0; s = 2.0*t/(1.0 + t*t); c = (1-t*t)/(1+t*t)
-        #vnewx = self.v[:,0]*np.cos(self.chrg*self.B*self.dt) + self.v[:,1]*np.sin(self.chrg*self.B*self.dt)
-        #vnewy = -self.v[:,0]*np.sin(self.chrg*self.B*self.dt) + self.v[:,1]*np.cos(self.chrg*self.B*self.dt)
         vnewx = self.v[:,0]*c - self.v[:,1]*s
         vnewy = self.v[:,0]*s + self.v[:,1]*c
         self.v[:,0] = vnewx; self.v[:,1] = vnewy
@@ -109,7 +108,8 @@ class PICES2D_Exp_Sparse:
             self.PushPars(i)
             self.InterpGridHydros(i+1)
             if i % notify == 0:
-                print('Completed time-step '  + str(i))
+                print('Completed time-step '  + str(i) + ': Simulation time is ' + str(self.time))
+            self.time += self.dt
         self.ComputeFieldPoisson(self.nstep)
         
     def KEnergy(self):

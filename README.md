@@ -42,7 +42,10 @@ uniform, fixed background of ions.  ExB drift has a shearing effect that leads t
 vortex formation.
 
 exampleDiocotronFG.py: Same as above, but with standard, full grid PIC instead of 
-sparse grids.  
+sparse grids. 
+
+exampleDiocotronFGwithForcing.py: Same as above, but with a sinusoidal forcing on 
+the right-hand-side of the Vlasov equation that evolves particle weights.
 
 exampleLandauDamp3DFG.py: Non-linear Landau damping in 3-D periodic box.  Uses 
 standard, full grids.
