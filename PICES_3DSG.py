@@ -16,11 +16,9 @@ from matplotlib import animation
 #plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
 
 
-class PICES3D_Exp_Sparse:
+class PICES3DSG:
     chrg = -1.
     space_norm = 1; time_norm = np.inf # Sets the space- and time-norms for variances
-    #imptol = 1.e-10 # Tolerance for Newton-Krylov iteration
-    #B = 10.
     def __init__(self,T_final,domx,domy,domz,numcellsx,numsteps,idata,Bfield_in,Npi,ifEext=False,Eext=0.,rho_overall=1.,nonunif_ions=False,ion_dens=0.):
         self.T = T_final
         self.n = int(np.log2(numcellsx-0.01))+1
@@ -29,6 +27,8 @@ class PICES3D_Exp_Sparse:
         self.dt = T_final/numsteps
         self.DomLenX = domx; self.DomLenY = domy; self.DomLenZ = domz
         self.dx = domx/self.ncelx; self.dy = domy/self.ncely; self.dz = domz/self.ncelz
+
+        self.time = 0.
         
         self.IDatGen = idata
         self.Bfield = Bfield_in
@@ -113,12 +113,15 @@ class PICES3D_Exp_Sparse:
         self.Ex[i], self.Ey[i], self.Ez[i] = self.phi[i].SparseDerivative()
         self.Ex[i] = -1.*self.Ex[i]; self.Ey[i] = -1.*self.Ey[i]; self.Ez[i] = -1.*self.Ez[i]
         
-    def Run(self):
+    def Run(self,notify=50):
         self.Initialize()
         for i in range(0,self.nstep):
             self.ComputeFieldPoisson(i)
             self.PushPars(i)
             self.InterpGridHydros(i+1)
+            if i % notify == 0:
+                print('Completed time-step ' + str(i) + ': Simulation time is ' + str(self.time))
+            self.time += self.dt
         self.ComputeFieldPoisson(self.nstep)
         
     def KEnergy(self):

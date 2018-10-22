@@ -14,7 +14,7 @@ import InterpolationRoutines_MV as IRMV
 import SpectralOps as SO
 
 
-class PICES3D_Exp_Clean:
+class PICES3D:
     chrg = -1.
     B = 0.
     def __init__(self,T_final,domx,domy,domz,numcellsx,numcellsy,numcellsz,numsteps,idata,Bfield_in,Npi):
@@ -24,6 +24,8 @@ class PICES3D_Exp_Clean:
         self.dt = T_final/numsteps
         self.DomLenX = domx; self.DomLenY = domy; self.DomLenZ = domz
         self.dx = domx/numcellsx; self.dy = domy/numcellsy; self.dz = domz/numcellsz
+
+        self.time = 0.
         
         self.IDatGen = idata
         self.Bfield = Bfield_in
@@ -87,13 +89,16 @@ class PICES3D_Exp_Clean:
         self.phi = SO.Poisson3Dperiodic(self.chrg*(self.rho - np.mean(self.rho))*self.DomLenX*self.DomLenY*self.DomLenZ,self.DomLenX,self.DomLenY,self.DomLenZ)
         self.E[:,:,:,0], self.E[:,:,:,1], self.E[:,:,:,2] = SO.SpectralDerivative3D(-1.*self.phi,self.DomLenX,self.DomLenY,self.DomLenZ)
         
-    def Run(self):
+    def Run(self,notify=50):
         self.Initialize()
         for i in range(0,self.nstep):
             self.ComputeFieldPoisson(i)
             self.PE[i] = 0.5*np.sum(self.phi*self.rho)*self.chrg*self.dx*self.dy*self.dz
             self.PushPars(self.E)
             self.InterpGridHydros(i+1)
+            if i % notify == 0:
+                print('Completed time-step ' + str(i) + ': Simulation time is ' + str(self.time))
+            self.time += self.dt
         self.ComputeFieldPoisson(self.nstep)
         self.PE[self.nstep] = 0.5*np.sum(self.phi*self.rho)*self.chrg*self.dx*self.dy*self.dz
         

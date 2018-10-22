@@ -5,7 +5,7 @@ Created on Mon Feb  8 15:38:41 2016
 @author: ricketsonl
 """
 import numpy as np
-import PICES3D_Exp_Clean_LowMem as PIC3D
+import PICES_3DFG as PIC3D
 import time
 import matplotlib.pyplot as plt
 import InverseSampling as IS
@@ -14,10 +14,10 @@ import InverseSampling as IS
 dsizex = 160.; dsizey = 160.; dsizez = 160.
 #dsizex = 2.*np.pi; dsizey = 2.*np.pi
 #dsizex = 21.; dsizey = 21.
-ncx = 128
+ncx = 50
 T = 2.7
-step_per_tp = 20.
-N_per_cell = 1
+step_per_tp = 5.
+N_per_cell = 64
 
 
 ## Derived Data ##
@@ -50,7 +50,7 @@ def Bfield(x):
     return np.zeros((x.shape[0],3))
     
 
-schimp = PIC3D.PICES3D_Exp_Clean(T,dsizex,dsizey,dsizez,ncx,ncx,ncx,nstep,idatgen,Bfield,N)
+schimp = PIC3D.PICES3D(T,dsizex,dsizey,dsizez,ncx,ncx,ncx,nstep,idatgen,Bfield,N)
 start = time.time()
 schimp.Run()
 end= time.time()

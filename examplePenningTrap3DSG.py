@@ -5,7 +5,7 @@ Created on Mon Feb  8 15:38:41 2016
 @author: ricketsonl
 """
 import numpy as np
-import PICES3D_Exp_Sparse_Eff as PIC3D
+import PICES_3DSG as PIC3D
 import time
 import matplotlib.pyplot as plt
 from mayavi import mlab
@@ -14,9 +14,9 @@ from scipy.special import ellipk, ellipe
 ## User Input ##
 dsizex = 160.; dsizey = 160.; dsizez = 160.
 ncx = 128
-T = 10.
+T = 15.
 step_per_tp = 10.
-N_per_sparse_cell = 15
+N_per_sparse_cell = 10
 
 n = int(np.log2(ncx))
 
@@ -42,30 +42,6 @@ def idatgen(N,Lx,Ly,Lz):
     
     return x, v
 
-def LoopField(x0,y0,z0,a,I,x,y,z):
-    rho2 = (x-x0)**2 + (y-y0)**2 + 1.0e-12
-    r2 = rho2 + (z-z0)**2
-    alpha2 = a**2 + r2 - 2.*a*np.sqrt(rho2)
-    beta2 = alpha2 + 4.*a*np.sqrt(rho2)
-    k2 = 1. - alpha2/beta2
-    C = I/np.pi
-    
-    E = ellipe(k2); K = ellipk(k2)
-    
-    Bx = np.zeros(x.shape)
-    By = np.zeros(x.shape)    
-    
-    Bx = C*(x-x0)*(z-z0)*( (a**2 + r2)*E - alpha2*K )/(2.*alpha2*np.sqrt(beta2)*rho2)
-    By = C*(y-y0)*(z-z0)*( (a**2 + r2)*E - alpha2*K )/(2.*alpha2*np.sqrt(beta2)*rho2)
-    Bz = C*( (a**2 - r2)*E + alpha2*K )/(2.*alpha2*np.sqrt(beta2))
-    
-    return Bx, By, Bz
-
-Bmin = 5.
-Mirror_Ratio = 5.
-a = 0.5*dsizez/np.sqrt( (2.*Mirror_Ratio)**(2./3.) - 1. )
-I = Bmin*( a**2 + (0.5*dsizez)**2 )**(1.5)/a**2
-
 def Bfield(x):
     B = np.zeros(x.shape)
     B[:,2] = 5.
@@ -80,7 +56,7 @@ def Efield_ext(x):
     return E
 
 bstart = time.time()
-schimp = PIC3D.PICES3D_Exp_Sparse(T,dsizex,dsizey,dsizez,ncx,nstep,idatgen,Bfield,N,ifEext=True,Eext=Efield_ext,rho_overall=0.1)
+schimp = PIC3D.PICES3DSG(T,dsizex,dsizey,dsizez,ncx,nstep,idatgen,Bfield,N,ifEext=True,Eext=Efield_ext,rho_overall=0.1)
 bend = time.time()
 print('Time to build scheme object: ' + str(bend-bstart))
 
@@ -131,15 +107,9 @@ y = np.linspace(0.,dsizey,ncel_pic,endpoint=False)
 z = np.linspace(0.,dsizez,ncel_pic,endpoint=False)
 
 Y, X, Z = np.meshgrid(x,y,z)
-Bxl, Byl, Bzl = LoopField(dsizex/2.,dsizey/2.,0.,a,I,X,Y,Z)
-Bxu, Byu, Bzu = LoopField(dsizex/2.,dsizey/2.,dsizez,a,I,X,Y,Z)
-
-theta = np.linspace(0.,2.*np.pi,500)
-xr = dsizex/2. + a*np.cos(theta); yr = dsizey/2. + a*np.sin(theta)
-zrl = np.zeros(500); zru = dsizez*np.ones(500)
 
 
-
+## Generate 3D contour plot of final density with Mayavi ##
 mlab.figure(bgcolor=(1,1,1),fgcolor=(0,0,0),size=(1024,768))
 mlab.contour3d(X,Y,Z,rhof/np.mean(rhof),contours=32,opacity=.5,colormap='jet',vmax=np.amax(rhof)/np.mean(rhof),vmin=np.amin(rhof)/np.mean(rhof))
 mlab.colorbar(orientation='vertical')
