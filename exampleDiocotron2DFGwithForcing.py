@@ -8,6 +8,7 @@ import numpy as np
 import PICES_2DFG as PIC2DFG
 import time
 import matplotlib.pyplot as plt
+import matplotlib
 import InverseSampling as IS
 
 ## User Input ##
