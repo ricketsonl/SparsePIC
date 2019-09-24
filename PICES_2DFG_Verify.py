@@ -393,6 +393,24 @@ class PICES2DFGV:
         self.phi[0] = SO.Poisson2Dperiodic(self.rho[0],self.DomLenX,self.DomLenY)
         self.E[0,:,:,1], self.E[0,:,:,0] = SO.SpectralDerivative2D(-1.*self.phi[0],self.DomLenX,self.DomLenY)
         
+        ## Do an initial backward half-step to offset positions and velocities in time
+        self.Epare, self.Epari = self.IPVec(self.E[0])
+        dt_tmp = -0.5*self.dt
+
+        self.vi += 0.5*dt_tmp*self.chrgi*self.Epari
+        t = self.chrgi*self.B*dt_tmp/2.0; s = 2.0*t/(1.0 + t*t); c = (1-t*t)/(1+t*t)
+        vnewx = self.vi[:,0]*c - self.vi[:,1]*s
+        vnewy = self.vi[:,0]*s + self.vi[:,1]*c
+        self.vi[:,0] = vnewx; self.vi[:,1] = vnewy
+        self.vi += 0.5*dt_tmp*self.chrgi*self.Epari
+        
+        self.ve += 0.5*dt_tmp*self.chrge*self.Epare
+        t = self.chrge*self.B*dt_tmp/2.0; s = 2.0*t/(1.0 + t*t); c = (1-t*t)/(1+t*t)
+        vnewx = self.ve[:,0]*c - self.ve[:,1]*s
+        vnewy = self.ve[:,0]*s + self.ve[:,1]*c
+        self.ve[:,0] = vnewx; self.ve[:,1] = vnewy
+        self.ve += 0.5*dt_tmp*self.chrge*self.Epare
+
     def ComputeFieldPoisson(self,i):
 #        self.phi[i] = SO.Poisson2Dperiodic(self.chrge*(self.rho[i] - np.mean(self.rho[i]))*self.DomLenX*self.DomLenY,self.DomLenX,self.DomLenY)
         self.phi[i] = SO.Poisson2Dperiodic(self.rho[i],self.DomLenX,self.DomLenY)

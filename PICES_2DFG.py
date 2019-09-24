@@ -121,7 +121,17 @@ class PICES2DFG:
         self.InterpGridHydros(0)
         self.phi[0] = SO.Poisson2Dperiodic(self.chrg*(self.rho[0] - np.mean(self.rho[0]))*self.DomLenX*self.DomLenY,self.DomLenX,self.DomLenY)
         self.E[0,:,:,1], self.E[0,:,:,0] = SO.SpectralDerivative2D(-1.*self.phi[0],self.DomLenX,self.DomLenY)
-        
+
+        ## Do an initial backward half-step to offset positions and velocities in time
+        self.Epar = self.IPVec(self.E[0])
+        dt_tmp = -0.5*self.dt
+        self.v += 0.5*dt_tmp*self.chrg*self.Epar
+        t = self.chrg*self.B*dt_tmp/2.0; s = 2.0*t/(1.0 + t*t); c = (1-t*t)/(1+t*t)
+        vnewx = self.v[:,0]*c - self.v[:,1]*s
+        vnewy = self.v[:,0]*s + self.v[:,1]*c
+        self.v[:,0] = vnewx; self.v[:,1] = vnewy
+        self.v += 0.5*dt_tmp*self.chrg*self.Epar
+
     def ComputeFieldPoisson(self,i):
         self.phi[i] = SO.Poisson2Dperiodic(self.chrg*(self.rho[i] - np.mean(self.rho[i]))*self.DomLenX*self.DomLenY,self.DomLenX,self.DomLenY)
         self.E[i,:,:,1], self.E[i,:,:,0] = SO.SpectralDerivative2D(-1.*self.phi[i],self.DomLenX,self.DomLenY)
