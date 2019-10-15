@@ -52,6 +52,15 @@ class SparseGridEff2D:
             Y,X = np.meshgrid(x,y)
             m = f(X,Y)
             self.mgrids[i] = m.reshape(2**(self.n))
+
+    ## Zero out all but pgrids[j] so that we essentially just have a regular grid at 
+    ## that resolution.  Useful primarily for debugging.
+    def ZeroOutAllButOne(self,j):
+        for i in range(self.n):
+            if not i == j:
+                self.pgrids[i] = 0.
+        for i in range(self.n-1):
+            self.mgrids[i] = 0.
         
     def EvaluateAt(self,x):
         if self.imode == 'cubic':

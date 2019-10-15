@@ -34,6 +34,12 @@ EffSparseModules=[Extension("SparseGridInterpRoutines",
                         libraries=["m"],
                         extra_compile_args = ["-fopenmp","-O3","-ffast-math"],
                         extra_link_args = ["-fopenmp"])]
+
+PiecewiseDepositionModules=[Extension("PiecewiseCurrentDeposition",
+                        ["PiecewiseCurrentDeposition.pyx"],
+                        libraries=["m"],
+                        extra_compile_args = ["-fopenmp","-O3","-ffast-math"],
+                        extra_link_args = ["-fopenmp"])]
                        
 setup(name="InterpolationRoutines_MV",
       cmdclass = {"build_ext": build_ext},
@@ -50,3 +56,7 @@ setup(name="InterpolationRoutines_",
 setup(name="SparseGridInterpRoutines",
       cmdclass = {"build_ext": build_ext},
       ext_modules = EffSparseModules,include_dirs=[np.get_include()],)
+
+setup(name="PiecewiseCurrentDeposition",
+      cmdclass = {"build_ext": build_ext},
+      ext_modules = PiecewiseDepositionModules,include_dirs=[np.get_include()],)
