@@ -156,18 +156,34 @@ class PICES2DFGV:
         self.ve += 0.5*self.dt*self.chrge*self.Epare
         self.vi += 0.5*self.dt*self.chrgi*self.Epari
 
-        self.xe += self.dt*self.ve
-        self.xi += self.dt*self.vi
-
-        self.xe[:,0] %= self.DomLenX; self.xe[:,1] %= self.DomLenY
-        self.xi[:,0] %= self.DomLenX; self.xi[:,1] %= self.DomLenY
 
 
         ## If varying weights, update them here
         if self.varwts:
-            for i in range(0,self.npi): 
-                self.parwtse[i] += self.dt*self.rhse(self.xe[i,:],self.ve[i,:],self.time,self.chrge,self.DomLenX,self.DomLenY)/self.f0e[i]
-                self.parwtsi[i] += self.dt*self.rhsi(self.xi[i,:],self.vi[i,:],self.time,self.chrgi,self.DomLenX,self.DomLenY)/self.f0i[i]
+            #for i in range(0,self.npi): 
+            #    self.parwtse[i] += self.dt*self.rhse(self.xe[i,:],self.ve[i,:],self.time,self.chrge,self.DomLenX,self.DomLenY)/self.f0e[i]
+            #    self.parwtsi[i] += self.dt*self.rhsi(self.xi[i,:],self.vi[i,:],self.time,self.chrgi,self.DomLenX,self.DomLenY)/self.f0i[i]
+            self.xe += 0.5*self.dt*self.ve
+            self.xi += 0.5*self.dt*self.vi
+
+            self.xe[:,0] %= self.DomLenX; self.xe[:,1] %= self.DomLenY
+            self.xi[:,0] %= self.DomLenX; self.xi[:,1] %= self.DomLenY
+            
+            self.parwtsi += self.dt*self.rhsi(self.xi,self.vi,self.time,self.chrge,self.DomLenX,self.DomLenY)/self.f0i
+            self.parwtse += self.dt*self.rhse(self.xe,self.ve,self.time,self.chrge,self.DomLenX,self.DomLenY)/self.f0e
+            
+            self.xe += 0.5*self.dt*self.ve
+            self.xi += 0.5*self.dt*self.vi
+
+            self.xe[:,0] %= self.DomLenX; self.xe[:,1] %= self.DomLenY
+            self.xi[:,0] %= self.DomLenX; self.xi[:,1] %= self.DomLenY
+        else:
+            self.xe += self.dt*self.ve
+            self.xi += self.dt*self.vi
+
+            self.xe[:,0] %= self.DomLenX; self.xe[:,1] %= self.DomLenY
+            self.xi[:,0] %= self.DomLenX; self.xi[:,1] %= self.DomLenY
+            
 
     def computeEDF(self, x, v):
         Fe = np.zeros(16); Fi = np.zeros(16)
@@ -395,7 +411,7 @@ class PICES2DFGV:
         
         ## Do an initial backward half-step to offset positions and velocities in time
         self.Epare, self.Epari = self.IPVec(self.E[0])
-        dt_tmp = -0.5*self.dt
+        dt_tmp = -1.*0.5*self.dt
 
         self.vi += 0.5*dt_tmp*self.chrgi*self.Epari
         t = self.chrgi*self.B*dt_tmp/2.0; s = 2.0*t/(1.0 + t*t); c = (1-t*t)/(1+t*t)
