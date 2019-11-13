@@ -169,8 +169,8 @@ class PICES2DFGV:
             self.xe[:,0] %= self.DomLenX; self.xe[:,1] %= self.DomLenY
             self.xi[:,0] %= self.DomLenX; self.xi[:,1] %= self.DomLenY
             
-            self.parwtsi += self.dt*self.rhsi(self.xi,self.vi,self.time,self.chrge,self.DomLenX,self.DomLenY)/self.f0i
-            self.parwtse += self.dt*self.rhse(self.xe,self.ve,self.time,self.chrge,self.DomLenX,self.DomLenY)/self.f0e
+            self.parwtsi += self.dt*self.rhsi(self.xi,self.vi,self.time+0.5*self.dt,self.chrge,self.DomLenX,self.DomLenY)/self.f0i
+            self.parwtse += self.dt*self.rhse(self.xe,self.ve,self.time+0.5*self.dt,self.chrge,self.DomLenX,self.DomLenY)/self.f0e
             
             self.xe += 0.5*self.dt*self.ve
             self.xi += 0.5*self.dt*self.vi
