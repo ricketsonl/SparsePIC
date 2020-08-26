@@ -57,6 +57,6 @@ setup(name="SparseGridInterpRoutines",
       cmdclass = {"build_ext": build_ext},
       ext_modules = EffSparseModules,include_dirs=[np.get_include()],)
 
-setup(name="PiecewiseCurrentDeposition",
-      cmdclass = {"build_ext": build_ext},
-      ext_modules = PiecewiseDepositionModules,include_dirs=[np.get_include()],)
+#setup(name="PiecewiseCurrentDeposition",
+#      cmdclass = {"build_ext": build_ext},
+#      ext_modules = PiecewiseDepositionModules,include_dirs=[np.get_include()],)

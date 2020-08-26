@@ -30,12 +30,14 @@ def InterpGrid(np.ndarray[double, ndim=1] x, np.ndarray[double, ndim=1] v, doubl
     cdef np.ndarray[np.double_t,ndim=1] F
     cdef unsigned int xsize = x.shape[0]
     F = np.zeros(ncel,dtype=np.double)
-    
+
     for i in range(xsize):
         ind = <unsigned int>(x[i]/dx)
         xl = ind*dx
         wtl = (x[i]-xl)/dx; wtr = 1.0-wtl
+        
         F[ind] += wtl*v[i]
+
         
         if ind < ncel-1:
             F[ind+1] += wtr*v[i]
